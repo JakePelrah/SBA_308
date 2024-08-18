@@ -49,8 +49,6 @@ learnerBody.innerHTML = LearnerSubmissions
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
 const resultsTable = document.getElementById('results')
 resultsTable.innerText = JSON.stringify(result, null, 2)
-console.log(result)
-
 
 
 function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
@@ -62,70 +60,97 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   }
   // catch the error and show an alert, stop the function
   catch {
-    window.alert('Mismatched course ID: AssignmentGroup does not belong to its course')
+    window.alert('Mismatched course ID: AssignmentGroup does not belong to its course.')
     return
   }
 
-  // calculate scores for learner submissions
+  // filter assignments that are not due or points possible is zero
   const { assignments } = assignmentGroup
-  const calculatedScores = learnerSubmissions.map(learner => {
+  const filteredLearnerSubmissions = learnerSubmissions.map(learner => {
 
-    // find the the submission in assignments
-    const assignment = assignments.find(obj => obj.id === learner.assignment_id)
+    // get the assignment info 
+    const assignment = getAssignment(assignments, learner.assignment_id)
 
-    try {
-      // calculate the final score
-      let finalScore = calculateScore(learner.submission.score, assignment.points_possible)
+    // if assignment not due or points possible are not zero
+    if (isDue(assignment.due_at)
+      && parseFloat(assignment.points_possible)
+      !== 0) {
 
-      // if assignment is late, deduct 10 points
-      if (isLateSubmission(assignment.due_at, learner.submission.submitted_at)) {
-        finalScore -= 10
+      // simplify data
+      learner = {
+        ...learner,
+        ...learner.submission,
+        points_possible: assignment.points_possible
       }
-
-      // add finalScore and points possible to learner
-      learner.submission.finalScore = finalScore
-      learner.submission.points_possible = assignment.points_possible
-
-      // return reformatted learner
-      const newObj = { ...learner, ...learner.submission }
-      delete newObj.submission
-      return newObj
+      delete learner.submission
+      return learner
     }
-    catch {
-      console.log(`submission points possible are zero, skipping assignment`, assignment)
-    }
+    // filter undefined entries
+  }).filter(Boolean)
 
-  })
+  console.log(filteredLearnerSubmissions)
 
-  // remove undefined scores i.e assignements with zero points possible
-  const filteredScores = calculatedScores.filter(obj => obj !== undefined)
 
-  // group by leaner id
-  const idGroup = Object.groupBy(filteredScores, ({ learner_id }) => learner_id)
+  // const calculatedScores = learnerSubmissions.map(learner => {
 
-  // calculate the average grade
-  for (const learner in idGroup) {
-    let num = 0
-    let denom = 0
-    idGroup[learner].forEach(element => {
-      num += element.score
-      denom += element.points_possible
-    });
-    idGroup[learner].avg = (num / denom * 100).toFixed(2)
-  }
+  //   // find the the submission in assignments
+  //   const assignment = assignments.find(obj => obj.id === learner.assignment_id)
 
-  // restructure data
-  let result = []
-  for (const learner in idGroup) {
-    let newObj = {}
-    idGroup[learner].forEach(element => {
-      newObj.id = element.learner_id
-      newObj[element.assignment_id] = element.finalScore
-      newObj.avg = idGroup[learner].avg
-    });
-    result.push(newObj)
-  }
-  return result
+  //   try {
+  //     // calculate the final score
+  //     let finalScore = calculateScore(learner.submission.score, assignment.points_possible)
+
+  //     // if assignment is late, deduct 10 points
+  //     if (isLateSubmission(assignment.due_at, learner.submission.submitted_at)) {        
+  //       finalScore -= finalScore * .10
+  //     }
+
+  //     // add finalScore and points possible to learner
+  //     learner.submission.finalScore = finalScore
+  //     learner.submission.points_possible = assignment.points_possible
+
+  //     // return reformatted learner
+  //     const newObj = { ...learner, ...learner.submission }
+  //     delete newObj.submission
+  //     return newObj
+  //   }
+  //   catch {
+  //     console.log(`submission points possible are zero, skipping assignment`, assignment)
+  //   }
+
+  // })
+
+
+  // // remove undefined scores i.e assignements with zero points possible
+  // const filteredScores = calculatedScores.filter(obj => obj !== undefined)
+  // console.log(filteredScores)
+
+  // // group by leaner id
+  // const idGroup = Object.groupBy(filteredScores, ({ learner_id }) => learner_id)
+
+  // // calculate the average grade
+  // for (const learner in idGroup) {
+  //   let num = 0
+  //   let denom = 0
+  //   idGroup[learner].forEach(element => {
+  //     num += element.score
+  //     denom += element.points_possible
+  //   });
+  //   idGroup[learner].avg = (num / denom * 100).toFixed(2)
+  // }
+
+  // // restructure data
+  // let result = []
+  // for (const learner in idGroup) {
+  //   let newObj = {}
+  //   idGroup[learner].forEach(element => {
+  //     newObj.id = element.learner_id
+  //     newObj[element.assignment_id] = element.finalScore
+  //     newObj.avg = idGroup[learner].avg
+  //   });
+  //   result.push(newObj)
+  // }
+  // return result
 }
 
 
@@ -145,7 +170,7 @@ function calculateScore(score, pointsPossible) {
 
   // return score if points possible not equal to zero
   if (pointsPossible !== 0)
-    return (score / pointsPossible * 100).toFixed(2)
+    return (score / pointsPossible).toFixed(2)
   // can't divide by zero, throw an error
   else
     throw Error("Division by Zero")
@@ -160,3 +185,13 @@ function isLateSubmission(dueDate, submissionDate) {
   return dueDate.getTime() < submissionDate.getTime()
 }
 
+function isDue(dueDate) {
+  // convert string date to Date object
+  dueDate = new Date(dueDate)
+  // if due date is less than current date
+  return dueDate.getTime() <= new Date().getTime()
+}
+
+function getAssignment(assignments, learnerAssignmentId) {
+  return assignments.find(obj => obj.id === learnerAssignmentId)
+}
