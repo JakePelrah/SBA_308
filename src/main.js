@@ -45,15 +45,11 @@ learnerBody.innerHTML = LearnerSubmissions
   </tr>`).join('')
 
 
-
 // populate assignment details table
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
 const resultsTable = document.getElementById('results')
 resultsTable.innerText = JSON.stringify(result, null, 2)
 console.log(result)
-
-
-
 
 
 
@@ -64,11 +60,13 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   try {
     validateCourse(courseInfo, assignmentGroup)
   }
+  // catch the error and show an alert, stop the function
   catch {
     window.alert('Mismatched course ID: AssignmentGroup does not belong to its course')
     return
   }
 
+  // calculate scores for learner submissions
   const { assignments } = assignmentGroup
   const calculatedScores = learnerSubmissions.map(learner => {
 
@@ -88,7 +86,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
       learner.submission.finalScore = finalScore
       learner.submission.points_possible = assignment.points_possible
 
-      // return learner
+      // return reformatted learner
       const newObj = { ...learner, ...learner.submission }
       delete newObj.submission
       return newObj
@@ -104,7 +102,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
   // group by leaner id
   const idGroup = Object.groupBy(filteredScores, ({ learner_id }) => learner_id)
-
 
   // calculate the average grade
   for (const learner in idGroup) {
@@ -128,32 +125,38 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     });
     result.push(newObj)
   }
-
   return result
 }
 
 
 
 ///////////////////////// HELPER FUNCTIONS /////////////////////////  
+
 function validateCourse(courseInfo, assignmentGroup) {
+  // compare course id, throw an error if they don't match
   if (courseInfo.id !== assignmentGroup.course_id)
     throw ("Mismatched course ID: Assignment group does not belong to this course.")
 }
 
-
 function calculateScore(score, pointsPossible) {
+  // convert to floats
   pointsPossible = parseFloat(pointsPossible)
   score = parseFloat(score)
+
+  // return score if points possible not equal to zero
   if (pointsPossible !== 0)
     return (score / pointsPossible * 100).toFixed(2)
+  // can't divide by zero, throw an error
   else
     throw Error("Division by Zero")
 }
 
-
 function isLateSubmission(dueDate, submissionDate) {
+  // convert string date to Date object
   dueDate = new Date(dueDate)
   submissionDate = new Date(submissionDate)
+
+  // if submission date falls after due date return false, else true
   return dueDate.getTime() < submissionDate.getTime()
 }
 
