@@ -4,7 +4,13 @@ const CourseInfo = {
     id: 451,
     name: "Introduction to JavaScript"
   };
+
+  const CourseInfo2 = {
+    id: 453,
+    name: "Algorithms"
+  };
   
+
   // The provided assignment group.
   const AssignmentGroup = {
     id: 12345,
@@ -28,7 +34,7 @@ const CourseInfo = {
         id: 3,
         name: "Code the World",
         due_at: "3156-11-15",
-        points_possible: 500
+        points_possible: 0
       }
     ]
   };
@@ -76,3 +82,19 @@ const CourseInfo = {
       }
     }
   ];
+
+
+  // const result = [
+  //   {
+  //     id: 125,
+  //     avg: 0.985, // (47 + 150) / (50 + 150)
+  //     1: 0.94, // 47 / 50
+  //     2: 1.0 // 150 / 150
+  //   },
+  //   {
+  //     id: 132,
+  //     avg: 0.82, // (39 + 125) / (50 + 150)
+  //     1: 0.78, // 39 / 50
+  //     2: 0.833 // late: (140 - 15) / 150
+  //   }
+  // ];
