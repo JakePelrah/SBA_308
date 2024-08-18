@@ -34,7 +34,7 @@ const CourseInfo = {
         id: 3,
         name: "Code the World",
         due_at: "3156-11-15",
-        points_possible: 0
+        points_possible: 500
       }
     ]
   };

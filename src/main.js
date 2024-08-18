@@ -46,26 +46,11 @@ learnerBody.innerHTML = LearnerSubmissions
 
 
 
-
-
-//////////// Tests ////////////
-// validateCourse({id:23}, {course_id:2})
-
-
-
-// console.log(calculateScore(47, 60))
-// console.log(calculateScore(47, 0))
-
-
-
-
-// console.log(isLateSubmission("2023-01-25", "2023-01-25"))
-// console.log(isLateSubmission("2023-01-25", "2023-01-26"))
-
-function calculateWeightedAverages(submissions, assignments) {
-
-
-}
+// populate assignment details table
+const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
+const resultsTable = document.getElementById('results')
+resultsTable.innerText = JSON.stringify(result, null, 2)
+console.log(result)
 
 
 
@@ -76,18 +61,15 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
   // if an AssignmentGroup does not belong to its course (mismatching course_id), 
   // your program should throw an error, letting the user know that the input was invalid. 
-  // Similar data validation should occur elsewhere within the program
-
   try {
     validateCourse(courseInfo, assignmentGroup)
   }
   catch {
-    window.alert('Mismatched course ID')
+    window.alert('Mismatched course ID: AssignmentGroup does not belong to its course')
     return
   }
 
   const { assignments } = assignmentGroup
-
   const calculatedScores = learnerSubmissions.map(learner => {
 
     // find the the submission in assignments
@@ -132,7 +114,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
       num += element.score
       denom += element.points_possible
     });
-    idGroup[learner].avg = num / denom
+    idGroup[learner].avg = (num / denom * 100).toFixed(2)
   }
 
   // restructure data
@@ -146,9 +128,10 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     });
     result.push(newObj)
   }
-  
+
   return result
 }
+
 
 
 ///////////////////////// HELPER FUNCTIONS /////////////////////////  
@@ -162,7 +145,7 @@ function calculateScore(score, pointsPossible) {
   pointsPossible = parseFloat(pointsPossible)
   score = parseFloat(score)
   if (pointsPossible !== 0)
-    return score / pointsPossible * 100
+    return (score / pointsPossible * 100).toFixed(2)
   else
     throw Error("Division by Zero")
 }
