@@ -47,8 +47,9 @@ learnerBody.innerHTML = LearnerSubmissions
 
 // populate assignment details table
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
+console.log(result)
 const resultsTable = document.getElementById('results')
-resultsTable.innerText = JSON.stringify(result, null, 2)
+resultsTable.innerText = JSON.stringify(result)
 
 
 function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
@@ -66,7 +67,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
   // filter assignments that are not due or points possible is zero
   const { assignments } = assignmentGroup
-  const filteredLearnerSubmissions = learnerSubmissions.map(learner => {
+  let filteredLearnerSubmissions = learnerSubmissions.map(learner => {
 
     // get the assignment info 
     const assignment = getAssignment(assignments, learner.assignment_id)
@@ -80,7 +81,8 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
       learner = {
         ...learner,
         ...learner.submission,
-        points_possible: assignment.points_possible
+        points_possible: assignment.points_possible,
+        due_at: assignment.due_at
       }
       delete learner.submission
       return learner
@@ -88,69 +90,37 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     // filter undefined entries
   }).filter(Boolean)
 
-  console.log(filteredLearnerSubmissions)
 
 
-  // const calculatedScores = learnerSubmissions.map(learner => {
-
-  //   // find the the submission in assignments
-  //   const assignment = assignments.find(obj => obj.id === learner.assignment_id)
-
-  //   try {
-  //     // calculate the final score
-  //     let finalScore = calculateScore(learner.submission.score, assignment.points_possible)
-
-  //     // if assignment is late, deduct 10 points
-  //     if (isLateSubmission(assignment.due_at, learner.submission.submitted_at)) {        
-  //       finalScore -= finalScore * .10
-  //     }
-
-  //     // add finalScore and points possible to learner
-  //     learner.submission.finalScore = finalScore
-  //     learner.submission.points_possible = assignment.points_possible
-
-  //     // return reformatted learner
-  //     const newObj = { ...learner, ...learner.submission }
-  //     delete newObj.submission
-  //     return newObj
-  //   }
-  //   catch {
-  //     console.log(`submission points possible are zero, skipping assignment`, assignment)
-  //   }
-
-  // })
+  // calculate final scores
+  filteredLearnerSubmissions = filteredLearnerSubmissions.map(calculateScore)
 
 
-  // // remove undefined scores i.e assignements with zero points possible
-  // const filteredScores = calculatedScores.filter(obj => obj !== undefined)
-  // console.log(filteredScores)
+  const idGroup = Object.groupBy(filteredLearnerSubmissions, ({ learner_id }) => learner_id)
 
-  // // group by leaner id
-  // const idGroup = Object.groupBy(filteredScores, ({ learner_id }) => learner_id)
+  // calculate the average grade
+  for (const learner in idGroup) {
+    let num = 0
+    let denom = 0
+    idGroup[learner].forEach(element => {
+      num += element.score
+      denom += element.points_possible
+    });
+    idGroup[learner].average = num / denom
+  }
 
-  // // calculate the average grade
-  // for (const learner in idGroup) {
-  //   let num = 0
-  //   let denom = 0
-  //   idGroup[learner].forEach(element => {
-  //     num += element.score
-  //     denom += element.points_possible
-  //   });
-  //   idGroup[learner].avg = (num / denom * 100).toFixed(2)
-  // }
-
-  // // restructure data
-  // let result = []
-  // for (const learner in idGroup) {
-  //   let newObj = {}
-  //   idGroup[learner].forEach(element => {
-  //     newObj.id = element.learner_id
-  //     newObj[element.assignment_id] = element.finalScore
-  //     newObj.avg = idGroup[learner].avg
-  //   });
-  //   result.push(newObj)
-  // }
-  // return result
+  // restructure data
+  let result = []
+  for (const learner in idGroup) {
+    let newObj = {}
+    idGroup[learner].forEach(element => {
+      newObj.id = element.learner_id
+      newObj[element.assignment_id] = element.final_score
+      newObj.avg = idGroup[learner].average
+    });
+    result.push(newObj)
+  }
+  return result
 }
 
 
@@ -163,26 +133,28 @@ function validateCourse(courseInfo, assignmentGroup) {
     throw ("Mismatched course ID: Assignment group does not belong to this course.")
 }
 
-function calculateScore(score, pointsPossible) {
+function calculateScore(submission) {
+  let { score, points_possible, submitted_at, due_at } = submission
+
   // convert to floats
-  pointsPossible = parseFloat(pointsPossible)
+  points_possible = parseFloat(points_possible)
   score = parseFloat(score)
 
-  // return score if points possible not equal to zero
-  if (pointsPossible !== 0)
-    return (score / pointsPossible).toFixed(2)
-  // can't divide by zero, throw an error
-  else
-    throw Error("Division by Zero")
+  if (isLateSubmission(due_at, submitted_at)) {
+    score -= points_possible * .10
+  }
+
+  return { ...submission, score, final_score: score / points_possible }
 }
 
 function isLateSubmission(dueDate, submissionDate) {
+
   // convert string date to Date object
   dueDate = new Date(dueDate)
   submissionDate = new Date(submissionDate)
 
-  // if submission date falls after due date return false, else true
-  return dueDate.getTime() < submissionDate.getTime()
+  // if submission date falls after due date return true, else false
+  return submissionDate.getTime() > dueDate.getTime()
 }
 
 function isDue(dueDate) {
