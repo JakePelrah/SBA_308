@@ -27,6 +27,11 @@ td {
     border: 1px solid rgb(160 160 160);
     padding: 8px 10px;
 }
+#error-td{
+    background-color: red;
+    font-weight: bold;
+    color: white;
+}
 
 .mismatch {
     background-color: rgb(250, 57, 57);
