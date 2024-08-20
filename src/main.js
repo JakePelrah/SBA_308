@@ -1,5 +1,3 @@
-// Program data
-const { id, name: courseName, course_id, group_weight, assignments } = AssignmentGroup
 
 // populate HTML from data
 const courseTitle = document.getElementById('course-name')
@@ -8,11 +6,18 @@ courseTitle.innerText = `${CourseInfo.name} (${CourseInfo.id})`
 // populate assignment details table
 const assignmentDetailsTable = document.getElementById('assignment-group-details-table')
 const [detialsHead, detailsBody] = assignmentDetailsTable.children
-detialsHead.innerHTML = `<th>Field</th><th>Value</th>`
-detailsBody.innerHTML = Object.entries(AssignmentGroup)
-  .slice(0, 4)
-  .map(data => `<tr><td>${data[0]}</td><td>${data[1]}</td></tr>`)
-  .join('')
+detialsHead.innerHTML = `<th>ID</th>
+<th>Course Name</th>
+<th>Course ID</th>
+<th>Group Weight</th>
+`
+const { id, name, course_id, group_weight } = AssignmentGroup
+detailsBody.innerHTML =`<tr>
+    <td>${id}</td>
+    <td>${name}</td>
+    <td id="course-id">${course_id}</td>
+    <td>${group_weight}</td>
+    </tr>`
 
 // populate assignment table
 const assignmentsTable = document.getElementById('assignment-group-table')
@@ -45,7 +50,7 @@ learnerBody.innerHTML = LearnerSubmissions
   </tr>`).join('')
 
 
-// populate assignment details table
+// populate assignment results
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
 console.log(result)
 const resultsTable = document.getElementById('results')
@@ -61,7 +66,8 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   }
   // catch the error and show an alert, stop the function
   catch {
-    window.alert('Mismatched course ID: AssignmentGroup does not belong to its course.')
+    const courseID = document.getElementById('course-id')
+    courseID.classList.add('mismatch')
     return
   }
 

@@ -5,7 +5,8 @@ h1 {
     padding: 1em;
 }
 
-h2,div{
+h2,
+div {
     text-align: center;
 }
 
@@ -25,4 +26,21 @@ th,
 td {
     border: 1px solid rgb(160 160 160);
     padding: 8px 10px;
+}
+
+.mismatch {
+    background-color: rgb(250, 57, 57);
+}
+
+.mismatch::after {
+    content: ': Mismtached Course ID';
+    animation: strobe 1s linear infinite;
+    font-weight: bold;
+}
+
+
+@keyframes strobe {
+    50% {
+        opacity: 0;
+    }
 }

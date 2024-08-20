@@ -5,11 +5,6 @@ const CourseInfo = {
   name: "Introduction to JavaScript"
 };
 
-const CourseInfo2 = {
-  id: 453,
-  name: "Algorithms"
-};
-
 
 // The provided assignment group.
 const AssignmentGroup = {
@@ -35,6 +30,12 @@ const AssignmentGroup = {
       name: "Code the World",
       due_at: "3156-11-15",
       points_possible: 500
+    },
+    {
+      id: 4,
+      name: "No Points",
+      due_at: "2023-01-15",
+      points_possible: 0
     },
   ]
 };
@@ -79,6 +80,14 @@ const LearnerSubmissions = [
     submission: {
       submitted_at: "2023-03-07",
       score: 140
+    }
+  },
+  {
+    learner_id: 132,
+    assignment_id: 4,
+    submission: {
+      submitted_at: "2023-03-07",
+      score: 0
     }
   }
 ];
