@@ -1,4 +1,9 @@
 
+// errors table
+let errorMessages = []
+const errors = document.getElementById('errors-table')
+
+
 // populate course info
 const courseTitle = document.getElementById('course-name')
 courseTitle.innerText = `${CourseInfo.name} (${CourseInfo.id})`
@@ -56,8 +61,8 @@ resultsTable.innerText = JSON.stringify(result)
 console.log(result)
 
 
-function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
+function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   // if an AssignmentGroup does not belong to its course (mismatching course_id), 
   // your program should throw an error, letting the user know that the input was invalid. 
   try {
@@ -68,11 +73,28 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     // add mismatch class;  see .mismatch in css file
     const courseID = document.getElementById('course-id')
     courseID.classList.add('mismatch')
-    return
+    errorMessages.push('Mismatched course ID')
   }
 
-  // filter assignments that are not due or points possible is zero
+
+  // destructure assignments
   const { assignments } = assignmentGroup
+
+  try {
+    // ensure data is in the correct format
+    validatePointsFormat(assignments, learnerSubmissions)
+  } catch {
+    errorMessages.push('Assignments or submissions contains a non-numeric grade')
+  }
+
+  // populate error table
+  for (const msg of errorMessages) {
+    console.log(msg)
+    errors.innerHTML += `<td>${msg}</td>`
+  }
+
+
+  // filter assignments that are not due or points possible is zero
   let filteredLearnerSubmissions = learnerSubmissions.map(learner => {
 
     // get the assignment info 
@@ -95,8 +117,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     }
     // filter undefined entries
   }).filter(Boolean)
-
-
 
   // calculate final scores
   filteredLearnerSubmissions = filteredLearnerSubmissions.map(calculateScore)
@@ -126,6 +146,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     });
     result.push(newObj)
   }
+
   return result
 }
 
@@ -183,4 +204,36 @@ function isDue(dueDate) {
 // find the assignment 
 function getAssignment(assignments, learnerAssignmentId) {
   return assignments.find(obj => obj.id === learnerAssignmentId)
+}
+
+
+// parse points from assignements and submissions and check for NaN
+function validatePointsFormat(assignments, learnerSubmissions) {
+
+  // NaN flag
+  let nanFlag = { nan: false }
+
+  // check assignments for NaN
+  for (const a of assignments) {
+    if (isNaN(parseFloat(a.points_possible))) {
+      nanFlag.nan = true
+      nanFlag.type = 'assignments'
+      break
+    }
+  }
+
+  // check submissions for NaN
+  for (const s of learnerSubmissions) {
+    if (isNaN(parseFloat(s.submission.score))) {
+      console.log(s.submission.score)
+      nanFlag.nan = true
+      nanFlag.type = 'submissions'
+      break
+    }
+  }
+
+  // throw an error if we find NaN
+  if (nanFlag.nan) {
+    throw Error(`${nanFlag.type} contains a score which is not a number`)
+  }
 }
