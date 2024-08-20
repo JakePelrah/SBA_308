@@ -1,5 +1,5 @@
 
-// populate HTML from data
+// populate course info
 const courseTitle = document.getElementById('course-name')
 courseTitle.innerText = `${CourseInfo.name} (${CourseInfo.id})`
 
@@ -9,10 +9,9 @@ const [detialsHead, detailsBody] = assignmentDetailsTable.children
 detialsHead.innerHTML = `<th>ID</th>
 <th>Course Name</th>
 <th>Course ID</th>
-<th>Group Weight</th>
-`
+<th>Group Weight</th>`
 const { id, name, course_id, group_weight } = AssignmentGroup
-detailsBody.innerHTML =`<tr>
+detailsBody.innerHTML = `<tr>
     <td>${id}</td>
     <td>${name}</td>
     <td id="course-id">${course_id}</td>
@@ -52,9 +51,9 @@ learnerBody.innerHTML = LearnerSubmissions
 
 // populate assignment results
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
-console.log(result)
 const resultsTable = document.getElementById('results')
 resultsTable.innerText = JSON.stringify(result)
+console.log(result)
 
 
 function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
@@ -62,10 +61,11 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   // if an AssignmentGroup does not belong to its course (mismatching course_id), 
   // your program should throw an error, letting the user know that the input was invalid. 
   try {
-    validateCourse(courseInfo, assignmentGroup)
+    isValidCourse(courseInfo, assignmentGroup)
   }
-  // catch the error and show an alert, stop the function
+  // catch the error
   catch {
+    // add mismatch class;  see .mismatch in css file
     const courseID = document.getElementById('course-id')
     courseID.classList.add('mismatch')
     return
@@ -101,7 +101,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   // calculate final scores
   filteredLearnerSubmissions = filteredLearnerSubmissions.map(calculateScore)
 
-
+  // group by learner id
   const idGroup = Object.groupBy(filteredLearnerSubmissions, ({ learner_id }) => learner_id)
 
   // calculate the average grade
@@ -133,26 +133,33 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
 ///////////////////////// HELPER FUNCTIONS /////////////////////////  
 
-function validateCourse(courseInfo, assignmentGroup) {
+// validate the course courseInfo ID !== assigmentGroup ID
+function isValidCourse(courseInfo, assignmentGroup) {
   // compare course id, throw an error if they don't match
   if (courseInfo.id !== assignmentGroup.course_id)
     throw ("Mismatched course ID: Assignment group does not belong to this course.")
 }
 
+// calculate the final score for the submission
 function calculateScore(submission) {
+
+  // destructure the submission
   let { score, points_possible, submitted_at, due_at } = submission
 
   // convert to floats
   points_possible = parseFloat(points_possible)
   score = parseFloat(score)
 
+  // if the assignment is late 
   if (isLateSubmission(due_at, submitted_at)) {
+    // deduct 10 percent of  the total points possible from their score for that assignment
     score -= points_possible * .10
   }
 
   return { ...submission, score, final_score: score / points_possible }
 }
 
+// check if submission if late
 function isLateSubmission(dueDate, submissionDate) {
 
   // convert string date to Date object
@@ -163,13 +170,17 @@ function isLateSubmission(dueDate, submissionDate) {
   return submissionDate.getTime() > dueDate.getTime()
 }
 
+// check if assignment is due
 function isDue(dueDate) {
+
   // convert string date to Date object
   dueDate = new Date(dueDate)
+
   // if due date is less than current date
   return dueDate.getTime() <= new Date().getTime()
 }
 
+// find the assignment 
 function getAssignment(assignments, learnerAssignmentId) {
   return assignments.find(obj => obj.id === learnerAssignmentId)
 }

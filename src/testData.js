@@ -1,12 +1,14 @@
+// https://codesandbox.io/p/sandbox/sba-308-example-26sg4j?from-embed=
 
-// The provided course information.
+
+// provided course information.
 const CourseInfo = {
   id: 451,
   name: "Introduction to JavaScript"
 };
 
 
-// The provided assignment group.
+// provided assignment group.
 const AssignmentGroup = {
   id: 12345,
   name: "Fundamentals of JavaScript",
@@ -40,7 +42,7 @@ const AssignmentGroup = {
   ]
 };
 
-// The provided learner submission data.
+// provided learner submission data.
 const LearnerSubmissions = [
   {
     learner_id: 125,
@@ -92,7 +94,7 @@ const LearnerSubmissions = [
   }
 ];
 
-
+// provided result
 // const result = [
 //   {
 //     id: 125,
