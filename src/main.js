@@ -3,7 +3,6 @@
 let errorMessages = []
 const errors = document.getElementById('errors-table')
 
-
 // populate course info
 const courseTitle = document.getElementById('course-name')
 courseTitle.innerText = `${CourseInfo.name} (${CourseInfo.id})`
@@ -53,16 +52,14 @@ learnerBody.innerHTML = LearnerSubmissions
   <td>${data.submission.score}</td>
   </tr>`).join('')
 
-
 // populate assignment results
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions)
 const resultsTable = document.getElementById('results')
 resultsTable.innerText = JSON.stringify(result)
 console.log(result)
 
-
-
 function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
+
   // if an AssignmentGroup does not belong to its course (mismatching course_id), 
   // your program should throw an error, letting the user know that the input was invalid. 
   try {
@@ -75,7 +72,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     courseID.classList.add('mismatch')
     errorMessages.push('Mismatched course ID')
   }
-
 
   // destructure assignments
   const { assignments } = assignmentGroup
@@ -93,14 +89,13 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     errors.innerHTML += `<td>${msg}</td>`
   }
 
-
   // filter assignments that are not due or points possible is zero
   let filteredLearnerSubmissions = learnerSubmissions.map(learner => {
 
     // get the assignment info 
     const assignment = getAssignment(assignments, learner.assignment_id)
 
-    // if assignment not due or points possible are not zero
+    // if assignment is due and points possible is not zero
     if (isDue(assignment.due_at)
       && parseFloat(assignment.points_possible)
       !== 0) {
@@ -149,8 +144,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 
   return result
 }
-
-
 
 ///////////////////////// HELPER FUNCTIONS /////////////////////////  
 
@@ -206,7 +199,6 @@ function getAssignment(assignments, learnerAssignmentId) {
   return assignments.find(obj => obj.id === learnerAssignmentId)
 }
 
-
 // parse points from assignements and submissions and check for NaN
 function validatePointsFormat(assignments, learnerSubmissions) {
 
@@ -225,7 +217,6 @@ function validatePointsFormat(assignments, learnerSubmissions) {
   // check submissions for NaN
   for (const s of learnerSubmissions) {
     if (isNaN(parseFloat(s.submission.score))) {
-      console.log(s.submission.score)
       nanFlag.nan = true
       nanFlag.type = 'submissions'
       break
