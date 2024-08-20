@@ -7,7 +7,6 @@ const CourseInfo = {
   name: "Introduction to JavaScript"
 };
 
-
 // provided assignment group.
 const AssignmentGroup = {
   id: 12345,
@@ -39,12 +38,12 @@ const AssignmentGroup = {
       due_at: "2023-01-15",
       points_possible: 0
     },
-    {
-      id: 5,
-      name: "String Grade",
-      due_at: "2023-01-15",
-      points_possible: 'A+'
-    },
+    // {
+    //   id: 5,
+    //   name: "String Grade",
+    //   due_at: "2023-01-15",
+    //   points_possible: 'A+'
+    // },
   ]
 };
 
@@ -90,14 +89,14 @@ const LearnerSubmissions = [
       score: 140
     }
   },
-  {
-    learner_id: 132,
-    assignment_id: 4,
-    submission: {
-      submitted_at: "2023-03-07",
-      score: 'A+'
-    }
-  }
+  // {
+  //   learner_id: 132,
+  //   assignment_id: 4,
+  //   submission: {
+  //     submitted_at: "2023-03-07",
+  //     score: 'A+'
+  //   }
+  // }
 ];
 
 /////////////////////// DO NOT UNCOMMENT ///////////////////////

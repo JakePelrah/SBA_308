@@ -70,7 +70,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     // add mismatch class;  see .mismatch in css file
     const courseID = document.getElementById('course-id')
     courseID.classList.add('mismatch')
-    errorMessages.push('Mismatched course ID')
+    errorMessages.push('Mismatched course ID.')
   }
 
   // destructure assignments
@@ -80,7 +80,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     // ensure data is in the correct format
     validatePointsFormat(assignments, learnerSubmissions)
   } catch {
-    errorMessages.push('Assignments or submissions contains a non-numeric grade')
+    errorMessages.push('Assignments or submissions contains a non-numeric grade.')
   }
 
   // populate error table

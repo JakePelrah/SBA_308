@@ -4,6 +4,7 @@ Grade Calculator
 This program reads assignment and submission data from [testData.js](src/testData.js)  and outputs a learners id, average, and individial assignment scores.
 
 
+Uncomment assignment 5 to test against non-numeric grades.
 
 
 
